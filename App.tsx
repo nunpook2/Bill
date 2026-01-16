@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { ChefHat, ShoppingBag, Utensils, Printer, RotateCcw, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { BillMode } from './types';
@@ -13,6 +12,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [recentBills, setRecentBills] = useState<any[]>([]);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [initError, setInitError] = useState<string | null>(null);
 
   const fetchHistory = useCallback(async () => {
     try {
@@ -24,12 +24,17 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    initAnalytics();
-    const initQueue = async () => {
-      setIsLoading(true);
+    let isMounted = true;
+    
+    const initApp = async () => {
       try {
+        await initAnalytics();
+        
         const q = query(collection(db, "bills"), orderBy("timestamp", "desc"), limit(20));
         const querySnapshot = await getDocs(q);
+        
+        if (!isMounted) return;
+
         const now = new Date();
         const lastToday = querySnapshot.docs.find(d => {
           const data = d.data();
@@ -46,14 +51,22 @@ const App: React.FC = () => {
         } else {
           setQueueNumber(1);
         }
-      } catch (e) {
-        setQueueNumber(1);
+        
+        await fetchHistory();
+      } catch (e: any) {
+        console.error("Initialization error:", e);
+        if (isMounted) {
+          setInitError(e.message || "เกิดข้อผิดพลาดในการเชื่อมต่อข้อมูล");
+        }
       } finally {
-        setIsLoading(false);
-        fetchHistory();
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
-    initQueue();
+
+    initApp();
+    return () => { isMounted = false; };
   }, [fetchHistory]);
 
   const handlePrint = useCallback(async () => {
@@ -71,10 +84,29 @@ const App: React.FC = () => {
       fetchHistory();
     } catch (err) {
       console.error("Logging failed:", err);
+      alert("ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่");
     } finally {
       setIsLoading(false);
     }
   }, [mode, selectedTable, queueNumber, fetchHistory]);
+
+  if (initError && !recentBills.length) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center">
+          <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-slate-800 mb-2">เกิดข้อผิดพลาด</h2>
+          <p className="text-slate-500 mb-6">{initError}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-orange-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors"
+          >
+            ลองใหม่อีกครั้ง
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 no-print">
@@ -87,7 +119,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Control Sidebar - Clean White/Grey theme (No Black) */}
+      {/* Control Sidebar */}
       <div className="w-full md:w-[380px] bg-white border-r border-slate-200 p-8 flex flex-col shadow-sm">
         <div className="mb-10 flex items-center gap-3">
           <div className="bg-orange-50 p-2.5 rounded-xl text-orange-600">
@@ -182,16 +214,20 @@ const App: React.FC = () => {
               <Clock size={14} /> รายการล่าสุด
             </h3>
             <div className="space-y-2 max-h-[160px] overflow-y-auto custom-scrollbar">
-              {recentBills.map((bill) => (
-                <div key={bill.id} className="flex items-center justify-between p-3 bg-white rounded-lg text-xs border border-slate-100 shadow-sm">
-                  <span className="font-bold text-slate-700">
-                    {bill.type === BillMode.DINE_IN ? 'โต๊ะ' : 'คิว'} {bill.number}
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-mono">
-                    {bill.timestamp?.toDate().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              ))}
+              {recentBills.length > 0 ? (
+                recentBills.map((bill) => (
+                  <div key={bill.id} className="flex items-center justify-between p-3 bg-white rounded-lg text-xs border border-slate-100 shadow-sm">
+                    <span className="font-bold text-slate-700">
+                      {bill.type === BillMode.DINE_IN ? 'โต๊ะ' : 'คิว'} {bill.number}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {bill.timestamp?.toDate().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-[10px] text-slate-300 italic text-center py-4">ยังไม่มีประวัติรายการ</p>
+              )}
             </div>
           </div>
         </div>
