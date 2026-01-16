@@ -1,0 +1,5 @@
+{
+  "name": "Mini Food Bill Generator",
+  "description": "A lightweight food billing application for small restaurants. Features dine-in table management (10 tables) and takeaway queue numbering (1-100) with Firebase integration for record-keeping.",
+  "requestFramePermissions": []
+}
