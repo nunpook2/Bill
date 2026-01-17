@@ -1,7 +1,7 @@
 
-// Use @firebase namespaced packages to resolve named export type errors
-import { initializeApp } from "@firebase/app";
-import { getAnalytics, isSupported } from "@firebase/analytics";
+// นำเข้า Firebase โดยใช้ Direct URL เพื่อป้องกันปัญหา "Service not available" จากการ Mapping ที่ผิดพลาด
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
 import { 
   getFirestore, 
   collection, 
@@ -11,9 +11,9 @@ import {
   orderBy, 
   limit, 
   getDocs 
-} from "firebase/firestore";
+} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-// Firebase configuration for bill-9acbc
+// ใช้ Firebase API Key ดั้งเดิมที่ระบุมาในโปรเจกต์ bill-9acbc
 const firebaseConfig = {
   apiKey: "AIzaSyDEMVfonG8Yxr5-5xY4qOqSG58KTu50uUM",
   authDomain: "bill-9acbc.firebaseapp.com",
@@ -30,7 +30,7 @@ const app = initializeApp(firebaseConfig);
 // Export Firestore Instance
 export const db = getFirestore(app);
 
-// Safe Analytics initialization
+// ฟังก์ชันเริ่มต้น Analytics แบบปลอดภัย
 export const initAnalytics = async () => {
   if (typeof window !== 'undefined' && await isSupported()) {
     try {
@@ -43,7 +43,7 @@ export const initAnalytics = async () => {
   return null;
 };
 
-// Log bill to Firestore
+// บันทึกข้อมูลบิลลง Firestore
 export const logBill = async (type: string, number: number) => {
   try {
     return await addDoc(collection(db, "bills"), {
@@ -57,7 +57,7 @@ export const logBill = async (type: string, number: number) => {
   }
 };
 
-// Get recent bills
+// ดึงข้อมูลบิลล่าสุด
 export const getRecentBills = async (count: number = 5) => {
   try {
     const q = query(

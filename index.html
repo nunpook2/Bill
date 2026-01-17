@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
@@ -11,8 +12,6 @@
             font-family: 'Sarabun', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
-            margin: 0;
-            padding: 0;
         }
         .mono {
             font-family: 'Space Mono', monospace;
@@ -49,38 +48,24 @@
                 width: 99mm;
                 height: 105mm;
             }
+            /* เพิ่มความคมชัดสูงสุดสำหรับการพิมพ์ */
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 text-rendering: optimizeLegibility !important;
             }
         }
-        /* Custom scrollbar for sidebar history */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.475.0",
-    "firebase/app": "https://esm.sh/firebase@11.3.1/app",
-    "firebase/firestore": "https://esm.sh/firebase@11.3.1/firestore",
-    "firebase/analytics": "https://esm.sh/firebase@11.3.1/analytics",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "@firebase/app": "https://esm.sh/@firebase/app@^0.14.7",
-    "@firebase/analytics": "https://esm.sh/@firebase/analytics@^0.10.19",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "firebase/app": "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js",
+    "firebase/firestore": "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js",
+    "firebase/analytics": "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js",
     "firebase/": "https://esm.sh/firebase@^12.8.0/"
   }
 }
@@ -88,7 +73,5 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- Entry point script -->
-    <script type="module" src="./index.tsx"></script>
 </body>
 </html>
